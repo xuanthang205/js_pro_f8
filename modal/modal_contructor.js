@@ -2,7 +2,17 @@ const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 function Modal() {
-  this.openModal = (content) => {
+  this.openModal = (options = {}) => {
+    const {templateId} = options;
+    const template = $(`#${templateId}`)
+
+    if (!template) {
+      console.error(`#${templateId} không tồn tại`)
+      return
+    }
+
+    const content = template.content.cloneNode(true)
+
     // Create modal elements
     const backdrop = document.createElement("div");
     backdrop.className = "modal-backdrop";
@@ -18,7 +28,7 @@ function Modal() {
     modalContent.className = "modal-content";
 
     // Append content and element
-    modalContent.innerHTML = content;
+    modalContent.append(content);
     container.append(closeBtn, modalContent);
     backdrop.append(container);
     document.body.append(backdrop);
@@ -53,13 +63,17 @@ function Modal() {
 const modal = new Modal();
 
 $("#open-modal-1").onclick = () => {
-  modal.openModal("<p>jdhgfewhgooiwhg</p>")
+  modal.openModal({
+    templateId: "modal-1"
+  })
 }
 
 $("#open-modal-2").onclick = () => {
-  modal.openModal("<p>jewjrkoqruj o3pi4</p>")
+  modal.openModal({
+    templateId: "modal-2"
+  })
 }
 
-$("#open-modal-3").onclick = () => {
-  modal.openModal("<p>jwjr3ip jpo3qhrj</p>")
-}
+// $("#open-modal-3").onclick = () => {
+//   modal.openModal("<p>jwjr3ip jpo3qhrj</p>")
+// }
