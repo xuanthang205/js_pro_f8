@@ -78,6 +78,10 @@ function Modal(options = {}) {
         this._modalFooter.innerHTML = this._setFooterContent;
       }
 
+      this._footerButtons.forEach((button) => {
+        this._modalFooter.append(button);
+      })
+
       container.append(this._modalFooter);
     }
 
@@ -90,6 +94,17 @@ function Modal(options = {}) {
     if (this._modalFooter) {
       this._modalFooter.innerHTML = html;
     }
+  }
+
+  this._footerButtons = [];
+
+  this.addFooterButton = (title, cssClass, callback) => {
+    const button = document.createElement("button");
+    button.className = cssClass;
+    button.innerHTML = title;
+    button.onclick = callback;
+
+    this._footerButtons.push(button);
   }
 
   this.open = () => {
@@ -209,6 +224,7 @@ $("#open-modal-2").onclick = () => {
 const modal3 = new Modal({
   templateId: "modal-3",
   footer: true,
+  closeMethods: [],
   onOpen: () => {
     console.log("Modal 3 opened");
   },
@@ -221,7 +237,15 @@ $("#open-modal-3").onclick = () => {
   const modalElement = modal3.open();
 };
 
-modal3.setFooterContent(`
-  <button class="modal-btn modal-btn-secondary" id="modal-cancel-btn">Hủy</button>
-  <button class="modal-btn modal-btn-primary" id="modal-confirm-btn">Xác nhận</button>
-`);
+modal3.addFooterButton('<span>Danger</span>', 'modal-btn danger pull-left', (e) => {
+  alert('Danger button clicked');
+})
+
+modal3.addFooterButton('Cancel', 'modal-btn', (e) => {
+  modal3.close();
+})
+
+modal3.addFooterButton('<span>Agree</span>', 'modal-btn primary', (e) => {
+  modal3.close();
+})
+

@@ -57,7 +57,7 @@ main {
 .modal-container {
   position: relative;
   width: min(600px, 90%);
-  padding: 28px;
+  padding: 20px 20px 0;
   border-radius: 10px;
   background: #fff;
   transform: scale(0);
@@ -87,4 +87,29 @@ main {
 
 .no-scroll {
   overflow: hidden;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.modal-btn {
+  padding: 8px 20px;
+  color: #fff;
+  background: #464e63;
+}
+
+.modal-btn.primary {
+  background: #377aad;
+}
+
+.modal-btn.danger {
+  background: #cc4e27;
+}
+
+.modal-btn.pull-left {
+  margin-right: auto;
 }
