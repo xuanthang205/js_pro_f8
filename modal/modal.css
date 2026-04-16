@@ -10,12 +10,12 @@ html {
 
 body {
   font-size: 1.6rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 button {
   border: none;
-  outline: none;
+  background: none;
   background: transparent;
   cursor: pointer;
 }
@@ -40,9 +40,7 @@ main {
   background: rgba(0, 0, 0, 0.6);
   opacity: 0;
   visibility: hidden;
-  transition: opacity, visibility;
-  transition-duration: 0.3s;
-  transition-timing-function: ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-backdrop.show {
@@ -52,16 +50,17 @@ main {
 
 .modal-backdrop.show .modal-container {
   transform: scale(1);
+  transition: transform 0.3s ease;
 }
 
 .modal-container {
   position: relative;
   width: min(600px, 90%);
-  padding: 20px 20px 0;
+  padding: 28px;
   border-radius: 10px;
   background: #fff;
   transform: scale(0);
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .modal-close {
@@ -87,29 +86,4 @@ main {
 
 .no-scroll {
   overflow: hidden;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.modal-btn {
-  padding: 8px 20px;
-  color: #fff;
-  background: #464e63;
-}
-
-.modal-btn.primary {
-  background: #377aad;
-}
-
-.modal-btn.danger {
-  background: #cc4e27;
-}
-
-.modal-btn.pull-left {
-  margin-right: auto;
 }
