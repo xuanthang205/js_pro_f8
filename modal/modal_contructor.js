@@ -2,9 +2,21 @@ const $ = document.querySelector.bind(document);
 // .bind(document) tạo 1 hàm mới với this là document -> $ tương ứng với document.querySelector (có this là document)
 const $$ = document.querySelectorAll.bind(document);
 
-function Modal() {
+function Modal(options = {}) {
+  const { templateId, destroyOnclose = true, closeMethods = ["button", "overlay", "escape"], cssClass = [] } = options;
+  const template = $(`#${templateId}`);
+
+  if (!template) {
+    console.error(`#${templateId} not found.`);
+    return;
+  }
+
+  this._allowButtonClose = closeMethods.includes("button");
+  this._allowBackdropClose = closeMethods.includes("overlay");
+  this._allowEscapeClose = closeMethods.includes("escape");
+
   function getScrollbarWidth() {
-    if(getScrollbarWidth.value) {
+    if (getScrollbarWidth.value) {
       return getScrollbarWidth.value;
     }
 
@@ -23,104 +35,109 @@ function Modal() {
     return scrollbarWidth;
   }
 
-  this.openModal = (options = {}) => {
-    const { templateId, allowBackdropClose = true } = options;
-    const template = $(`#${templateId}`);
-
-    if (!template) {
-      console.error(`#${templateId} not found.`);
-      return;
-    }
-
+  this._build = () => {
     const content = template.content.cloneNode(true);
 
     // Create nodal elements
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop";
+    this._backdrop = document.createElement("div");
+    this._backdrop.className = "modal-backdrop";
 
     const container = document.createElement("div");
     container.className = "modal-container";
 
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "modal-close";
-    closeBtn.innerHTML = "&times;";
+    cssClass.forEach(className => {
+      if(typeof className === 'string') {
+        container.classList.add(className)
+      }
+    });
+
+    if (this._allowButtonClose) {
+      const closeBtn = document.createElement("button");
+      closeBtn.className = "modal-close";
+      closeBtn.innerHTML = "&times;";
+
+      container.append(closeBtn);
+      closeBtn.onclick = () => this.close();
+    }
 
     const modalContent = document.createElement("div");
     modalContent.className = "modal-modalContent";
 
     // Append content and elements
     modalContent.appendChild(content);
-    container.append(closeBtn, modalContent);
-    backdrop.appendChild(container);
-    document.body.appendChild(backdrop);
+    container.append(modalContent);
+    this._backdrop.appendChild(container);
+    document.body.appendChild(this._backdrop);
+  };
+
+  this.open = () => {
+    if (!this._backdrop) {
+      this._build();
+    }
 
     setTimeout(() => {
-      backdrop.classList.add("show");
+      this._backdrop.classList.add("show");
     }, 0);
 
     // Attach event listeners
-    closeBtn.onclick = () => this.closeModal(backdrop);
+    if (this._allowBackdropClose) {
+      this._backdrop.onclick = (e) => {
+        if (e.target === this._backdrop) {
+          this.close();
+        }
+      };
+    }
 
-    backdrop.onclick = (e) => {
-      if (e.target === backdrop && allowBackdropClose) {
-        this.closeModal(backdrop);
-      }
-    };
-
-    document.onkeydown = (e) => {
-      if (e.key === "Escape") {
-        this.closeModal(backdrop);
-      }
-    };
+    if (this._allowEscapeClose) {
+      document.onkeydown = (e) => {
+        if (e.key === "Escape") {
+          this.close();
+        }
+      };
+    }
 
     // Disable scroll when modal is open
     document.body.classList.add("no-scroll");
     document.body.style.paddingRight = `${getScrollbarWidth()}px`;
 
-    return backdrop;
+    return this._backdrop;
   };
 
-  this.closeModal = (modalElement) => {
-    modalElement.classList.remove("show");
-    modalElement.ontransitionend = () => {
-      modalElement.remove();
+  this.close = (destroy = destroyOnclose) => {
+    this._backdrop.classList.remove("show");
+    this._backdrop.ontransitionend = () => {
+      if (this._backdrop && destroy) {
+        this._backdrop.remove();
+        this._backdrop = null;
+      }
 
       // Enable scroll when modal is closed
       document.body.classList.remove("no-scroll");
       document.body.style.paddingRight = "";
     };
   };
+
+  this.destroy = () => {
+    this.close(true)
+  }
 }
 
-const modal = new Modal();
-
-// modal.openModal("<h1>Hello World!</h1>");
+const modal1 = new Modal({
+  templateId: "modal-1",
+  destroyOnclose: false,
+});
 
 $("#open-modal-1").onclick = function () {
-  modal.openModal({
-    templateId: "modal-1",
-  });
+  const modalElement = modal1.open();
 };
+
+const modal2 = new Modal({
+  templateId: "modal-2",
+  closeMethods: ["button", "escape"],
+  destroyOnclose: false,
+  cssClass: ['cl1', 'cl2']
+});
 
 $("#open-modal-2").onclick = function () {
-  const modalElement = modal.openModal({
-    templateId: "modal-2",
-    allowBackdropClose: false,
-  });
-
-  const form = modalElement.querySelector("#login-form");
-  if (form) {
-    form.onsubmit = function (e) {
-      e.preventDefault();
-      const data = {
-        email: $("#email").value.trim(),
-        password: $("#password").value.trim(),
-      };
-      console.log(data);
-    };
-  }
+  const modalElement = modal2.open();
 };
-
-// $("#open-modal-3").onclick = function () {
-//   modal.openModal("<h1>Hello World!</h1><p>This is a simple modal 3.</p>");
-// }
